@@ -88,7 +88,7 @@ function App() {
       <HelmetProvider>
         <BrowserRouter>
           <PostHogPageviewTracker />
-          <PageTitle title={"Unstract"} />
+          <PageTitle title={"DOCOQ"} />
           {GoogleTagManagerHelper && <GoogleTagManagerHelper />}
           {contextHolder}
           <Router />

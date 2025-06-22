@@ -58,6 +58,11 @@ class UserLoginTemplate:
     ERROR_PLACE_HOLDER = "error_message"
 
 
+class UserSignupTemplate:
+    TEMPLATE = "signup.html"
+    ERROR_PLACE_HOLDER = "error_message"
+
+
 class PluginConfig:
     PLUGINS_APP = "plugins"
     AUTH_MODULE_PREFIX = "auth"

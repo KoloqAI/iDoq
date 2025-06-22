@@ -14,7 +14,7 @@ from tenant_account_v2.organization_member_service import OrganizationMemberServ
 from utils.user_context import UserContext
 
 from account_v2.authentication_helper import AuthenticationHelper
-from account_v2.constants import DefaultOrg, ErrorMessage, UserLoginTemplate
+from account_v2.constants import DefaultOrg, ErrorMessage, UserLoginTemplate, UserSignupTemplate
 from account_v2.custom_exceptions import Forbidden, MethodNotImplemented
 from account_v2.dto import (
     CallbackData,
@@ -28,7 +28,7 @@ from account_v2.dto import (
 from account_v2.enums import UserRole
 from account_v2.models import Organization, User
 from account_v2.organization import OrganizationService
-from account_v2.serializer import LoginRequestSerializer
+from account_v2.serializer import LoginRequestSerializer, UserRegistrationSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +143,88 @@ class AuthenticationService:
         return serializer.validated_data
 
     def user_signup(self, request: HttpRequest) -> Any:
-        raise MethodNotImplemented()
+        """Handle user registration.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            Any: The response object.
+        """
+        if request.method == "GET":
+            return self.render_signup_page(request)
+        
+        try:
+            validated_data = self.validate_registration_data(request)
+            user = self.create_user_from_registration(validated_data)
+            if user:
+                # Log in the user after successful registration
+                login(request, user)
+                return redirect(settings.WEB_APP_ORIGIN_URL)
+            else:
+                return self.render_signup_page_with_error(request, "Failed to create user account.")
+        except ValueError as e:
+            return self.render_signup_page_with_error(request, str(e))
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            return self.render_signup_page_with_error(request, "An error occurred during registration.")
+
+    def render_signup_page(self, request: Request) -> Any:
+        """Render the signup page."""
+        return render(request, UserSignupTemplate.TEMPLATE)
+
+    def render_signup_page_with_error(self, request: Request, error_message: str) -> Any:
+        """Render the signup page with an error message."""
+        return render(
+            request,
+            UserSignupTemplate.TEMPLATE,
+            {UserSignupTemplate.ERROR_PLACE_HOLDER: error_message},
+        )
+
+    def validate_registration_data(self, request: Request) -> Any:
+        """Validate the registration data.
+
+        Args:
+            request (Request): The HTTP request object.
+
+        Returns:
+            dict: The validated registration data.
+
+        Raises:
+            ValueError: If the registration data is invalid.
+        """
+        serializer = UserRegistrationSerializer(data=request.POST)
+        if not serializer.is_valid():
+            error_messages = {
+                field: errors[0] for field, errors in serializer.errors.items()
+            }
+            first_error_message = list(error_messages.values())[0]
+            raise ValueError(first_error_message)
+        return serializer.validated_data
+
+    def create_user_from_registration(self, validated_data: dict) -> User:
+        """Create a new user from registration data.
+
+        Args:
+            validated_data (dict): The validated registration data.
+
+        Returns:
+            User: The created user object.
+        """
+        try:
+            user = User.objects.create_user(
+                username=validated_data['user_id'],
+                email=validated_data['email'],
+                password=validated_data['password'],
+                user_id=validated_data['user_id'],
+                country=validated_data['country'],
+                auth_provider=""
+            )
+            logger.info(f"Created new user: {user.email}")
+            return user
+        except Exception as e:
+            logger.error(f"Error creating user: {e}")
+            raise ValueError("Failed to create user account.")
 
     def is_admin_by_role(self, role: str) -> bool:
         """Check the role with actual admin Role.

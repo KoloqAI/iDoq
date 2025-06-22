@@ -89,6 +89,7 @@ class User(AbstractUser):
     )
 
     auth_provider = models.CharField(max_length=64, default="")
+    country = models.CharField(max_length=100, blank=True, null=True, help_text="Country of nationality")
 
     def __str__(self):  # type: ignore
         return f"User({self.id}, email: {self.email}, userId: {self.user_id})"

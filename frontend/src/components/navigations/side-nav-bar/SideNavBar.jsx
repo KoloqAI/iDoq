@@ -99,6 +99,14 @@ const SideNavBar = ({ collapsed }) => {
         },
         {
           id: 1.2,
+          title: "Projects",
+          description: "Manage your project settings and configurations",
+          image: PlatformSettingsIcon,
+          path: `/${orgName}/project`,
+          active: window.location.pathname.startsWith(`/${orgName}/projects`),
+        },
+        {
+          id: 1.3,
           title: "Workflows",
           description: "Build no-code data workflows for unstructured data",
           icon: BranchesOutlined,

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import { GenericError } from "../components/error/GenericError/GenericError.jsx";
 import { NotFound } from "../components/error/NotFound/NotFound.jsx";
@@ -6,11 +6,13 @@ import { PersistentLogin } from "../components/helpers/auth/PersistentLogin.js";
 import { RequireGuest } from "../components/helpers/auth/RequireGuest.js";
 import { OAuthStatus } from "../components/oauth-ds/oauth-status/OAuthStatus.jsx";
 import { LandingPage } from "../pages/LandingPage.jsx";
+import { RegisterPage } from "../pages/RegisterPage.jsx";
 import { SetOrgPage } from "../pages/SetOrgPage.jsx";
 import { useMainAppRoutes } from "./useMainAppRoutes.js";
 import { RequireAuth } from "../components/helpers/auth/RequireAuth.js";
 import { ToolIdePage } from "../pages/ToolIdePage.jsx";
 import { OutputAnalyzerPage } from "../pages/OutputAnalyzerPage.jsx";
+import { Login } from "../components/log-in/Login.jsx";
 
 let PublicPromptStudioHelper;
 
@@ -86,9 +88,14 @@ function Router() {
       <Route path="" element={<PersistentLogin />}>
         {/* public routes */}
         <Route path="">
+          {/* Default redirect to landing page */}
+          <Route index element={<Navigate to="/landing" replace />} />
+          
           {/* public routes accessible only to unauthenticated users */}
           <Route path="" element={<RequireGuest />}>
             <Route path="landing" element={<LandingPage />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<RegisterPage />} />
           </Route>
 
           {/* public routes accessible to both authenticated and unauthenticated users */}

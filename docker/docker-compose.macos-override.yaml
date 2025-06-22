@@ -1,0 +1,68 @@
+# Platform override for macOS ARM64 systems
+# This file forces AMD64/Linux images on Apple Silicon Macs
+
+services:
+  # Override all services to use AMD64 platform
+  backend:
+    platform: linux/amd64
+    
+  worker:
+    platform: linux/amd64
+    
+  worker-logging:
+    platform: linux/amd64
+    
+  worker-file-processing:
+    platform: linux/amd64
+    
+  worker-file-processing-callback:
+    platform: linux/amd64
+    
+  celery-flower:
+    platform: linux/amd64
+    
+  celery-beat:
+    platform: linux/amd64
+    
+  frontend:
+    platform: linux/amd64
+    
+  platform-service:
+    platform: linux/amd64
+    
+  prompt-service:
+    platform: linux/amd64
+    
+  x2text-service:
+    platform: linux/amd64
+    
+  runner:
+    platform: linux/amd64
+    
+  # Essential services from docker-compose-dev-essentials.yaml
+  db:
+    platform: linux/amd64
+    
+  redis:
+    platform: linux/amd64
+    
+  minio:
+    platform: linux/amd64
+    
+  createbuckets:
+    platform: linux/amd64
+    
+  reverse-proxy:
+    platform: linux/amd64
+    
+  feature-flag:
+    platform: linux/amd64
+    
+  unstructured-io:
+    platform: linux/amd64
+    
+  qdrant:
+    platform: linux/amd64
+    
+  rabbitmq:
+    platform: linux/amd64 

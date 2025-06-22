@@ -113,6 +113,42 @@ class LoginRequestSerializer(serializers.Serializer):
         return value
 
 
+class UserRegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    user_id = serializers.CharField(required=True, max_length=150)
+    password = serializers.CharField(required=True, write_only=True)
+    confirm_password = serializers.CharField(required=True, write_only=True)
+    country = serializers.CharField(required=True, max_length=100)
+
+    def validate_email(self, value: str) -> str:
+        """Check that the email is valid and not already in use."""
+        from account_v2.models import User
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+    def validate_user_id(self, value: str) -> str:
+        """Check that the user_id is valid and not already in use."""
+        from account_v2.models import User
+        if User.objects.filter(user_id=value).exists():
+            raise serializers.ValidationError("A user with this user ID already exists.")
+        if len(value) < 3:
+            raise serializers.ValidationError("User ID must be at least 3 characters long.")
+        return value
+
+    def validate_password(self, value: str) -> str:
+        """Check that the password meets requirements."""
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        return value
+
+    def validate(self, data):
+        """Check that passwords match."""
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+
 class UserSessionResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     user_id = serializers.CharField()

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 function PageTitle({ title }) {
   return (
     <Helmet>
-      <title>{title ? `${title} - Unstract` : "Unstract"}</title>
+      <title>{title ? `${title} - Docoq` : "DOCOQ"}</title>
     </Helmet>
   );
 }

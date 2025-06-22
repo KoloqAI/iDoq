@@ -13,6 +13,9 @@ yellow_text='\033[33m'
 # set -x/xtrace uses PS4 for more info
 PS4="$blue_text"'${0}:${LINENO}: '"$default_text"
 
+# Source platform detection script
+script_dir=$(dirname "$(readlink -f "$BASH_SOURCE")")
+source "$script_dir/docker/scripts/detect_platform.sh"
 
 debug() {
   if [ "$opt_verbose" = true ]; then
@@ -243,17 +246,26 @@ setup_env() {
 build_services() {
   pushd "$script_dir/docker" 1>/dev/null
 
+  # Detect platform and set compose files
+  platform=$(detect_platform)
+  local compose_files="-f docker-compose.yaml"
+  
+  if [[ "$platform" == "macos_arm64" ]]; then
+    echo -e "$yellow_text""Detected macOS ARM64. Using AMD64 platform override for compatibility.""$default_text"
+    compose_files="-f docker-compose.yaml -f docker-compose.macos-override.yaml"
+  fi
+
   if [ "$opt_build_local" = true ]; then
     echo -e "$blue_text""Building""$default_text"" docker images ""$blue_text""$opt_version""$default_text"" locally."
-    VERSION=$opt_version $docker_compose_cmd -f "$script_dir/docker/docker-compose.build.yaml" build || {
+    VERSION=$opt_version $docker_compose_cmd $compose_files build || {
       echo -e "$red_text""Failed to build docker images.""$default_text"
       exit 1
     }
   elif [ "$first_setup" = true ] || [ "$opt_update" = true ]; then
     echo -e "$blue_text""Pulling""$default_text"" docker images tag ""$blue_text""$opt_version""$default_text""."
     # Try again on a slow network.
-    VERSION=$opt_version $docker_compose_cmd -f "$script_dir/docker/docker-compose.yaml" pull ||
-    VERSION=$opt_version $docker_compose_cmd -f "$script_dir/docker/docker-compose.yaml" pull || {
+    VERSION=$opt_version $docker_compose_cmd $compose_files pull ||
+    VERSION=$opt_version $docker_compose_cmd $compose_files pull || {
       echo -e "$red_text""Failed to pull docker images.""$default_text"
       echo -e "$red_text""Either version not found or docker is not running.""$default_text"
       echo -e "$red_text""Please check and try again.""$default_text"
@@ -272,8 +284,17 @@ build_services() {
 run_services() {
   pushd "$script_dir/docker" 1>/dev/null
 
+  # Detect platform and set compose files
+  platform=$(detect_platform)
+  local compose_files="-f docker-compose.yaml"
+  
+  if [[ "$platform" == "macos_arm64" ]]; then
+    echo -e "$yellow_text""Detected macOS ARM64. Using AMD64 platform override for compatibility.""$default_text"
+    compose_files="-f docker-compose.yaml -f docker-compose.macos-override.yaml"
+  fi
+
   echo -e "$blue_text""Starting docker containers in detached mode""$default_text"
-  VERSION=$opt_version $docker_compose_cmd up -d
+  VERSION=$opt_version $docker_compose_cmd $compose_files up -d
 
   if [ "$opt_update" = true ]; then
     echo ""
@@ -288,10 +309,10 @@ run_services() {
   fi
   echo -e "\nOnce the services are up, visit ""$blue_text""http://frontend.unstract.localhost""$default_text"" in your browser."
   echo -e "\nSee logs with:"
-  echo -e "    ""$blue_text""$docker_compose_cmd -f docker/docker-compose.yaml logs -f""$default_text"
+  echo -e "    ""$blue_text""$docker_compose_cmd $compose_files logs -f""$default_text"
   echo -e "Configure services by updating corresponding ""$yellow_text""<service>/.env""$default_text"" files."
   echo -e "Make sure to ""$yellow_text""restart""$default_text"" the services with:"
-  echo -e "    ""$blue_text""$docker_compose_cmd -f docker/docker-compose.yaml up -d""$default_text"
+  echo -e "    ""$blue_text""$docker_compose_cmd $compose_files up -d""$default_text"
   if [ "$first_setup" = true ]; then
     echo -e "\n###################### BACKUP ENCRYPTION KEY ######################"
     echo -e "Copy the value of ""$yellow_text""ENCRYPTION_KEY""$default_text"" in any of the following env files"
@@ -320,8 +341,19 @@ opt_version="latest"
 
 script_dir=$(dirname "$(readlink -f "$BASH_SOURCE")")
 first_setup=false
-# Extract service names from docker compose file.
-services=($(VERSION=$opt_version $docker_compose_cmd -f "$script_dir/docker/docker-compose.build.yaml" config --services))
+
+# Source platform detection script
+source "$script_dir/docker/scripts/detect_platform.sh"
+
+# Extract service names from docker compose file with platform detection
+platform=$(detect_platform)
+compose_files="-f $script_dir/docker/docker-compose.yaml"
+
+if [[ "$platform" == "macos_arm64" ]]; then
+    compose_files="-f $script_dir/docker/docker-compose.yaml -f $script_dir/docker/docker-compose.macos-override.yaml"
+fi
+
+services=($(VERSION=$opt_version $docker_compose_cmd $compose_files config --services))
 current_version=""
 target_branch=""
 

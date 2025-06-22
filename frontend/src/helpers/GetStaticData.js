@@ -22,7 +22,7 @@ const calculateDivHeight = (offset) => {
   return calculatedHeight;
 };
 
-const publicRoutes = ["/landing"];
+const publicRoutes = ["/landing", "/login", "/register"];
 
 /*
   This function will return the url without the path/routes

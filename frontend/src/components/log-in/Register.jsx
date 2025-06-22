@@ -8,20 +8,25 @@ import "./Login.css";
 import { UnstractBlackLogo } from "../../assets";
 import { ProductContentLayout } from "./ProductContentLayout";
 
-let LoginForm = null;
+let RegisterForm = null;
 try {
-  LoginForm = require("../../plugins/login-form/LoginForm").LoginForm;
+  RegisterForm =
+    require("../../plugins/register-form/RegisterForm").RegisterForm;
 } catch {
   // The components will remain null of it is not available
 }
 
-function Login() {
+function Register() {
   const baseUrl = getBaseUrl();
-  const newURL = baseUrl + "/api/v1/login";
+  const newURL = baseUrl + "/api/v1/signup";
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleRegister = () => {
     window.location.href = newURL;
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
   };
 
   const handleBack = () => {
@@ -31,8 +36,8 @@ function Login() {
   return (
     <div className="login-main">
       <Row>
-        {LoginForm ? (
-          <LoginForm handleLogin={handleLogin} />
+        {RegisterForm ? (
+          <RegisterForm handleRegister={handleRegister} />
         ) : (
           <>
             <Col xs={24} md={12} className="login-left-section">
@@ -49,10 +54,16 @@ function Login() {
                 <div>
                   <Button
                     className="login-button button-margin"
-                    onClick={handleLogin}
+                    onClick={handleRegister}
                   >
-                    Login
+                    Register
                   </Button>
+                  <div className="login-link">
+                    Already have an account?{" "}
+                    <a href="#" onClick={handleLogin}>
+                      Login here
+                    </a>
+                  </div>
                 </div>
               </div>
             </Col>
@@ -66,4 +77,4 @@ function Login() {
   );
 }
 
-export { Login };
+export { Register };

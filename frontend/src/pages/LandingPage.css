@@ -1,0 +1,98 @@
+.landing-main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.landing-left-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #ffffff;
+}
+
+.landing-content-wrapper {
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.landing-content-wrapper .logo {
+  margin-bottom: 3rem;
+  max-width: 200px;
+}
+
+.landing-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.register-button {
+  width: 100%;
+  max-width: 300px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: #1890ff;
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.register-button:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.landing-link {
+  margin-top: 1rem;
+  font-size: 14px;
+  color: #666;
+}
+
+.landing-link a {
+  color: #1890ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.landing-link a:hover {
+  text-decoration: underline;
+}
+
+.landing-right-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.button-margin {
+  margin-bottom: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .landing-left-section,
+  .landing-right-section {
+    min-height: 50vh;
+  }
+  
+  .landing-content-wrapper .logo {
+    margin-bottom: 2rem;
+    max-width: 150px;
+  }
+  
+  .register-button {
+    max-width: 250px;
+    height: 44px;
+    font-size: 14px;
+  }
+} 

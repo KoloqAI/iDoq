@@ -20,6 +20,7 @@ import { CustomToolsHelper } from "../components/helpers/custom-tools/CustomTool
 import { ToolIdePage } from "../pages/ToolIdePage.jsx";
 import { OutputAnalyzerPage } from "../pages/OutputAnalyzerPage.jsx";
 import { LogsPage } from "../pages/LogsPage.jsx";
+import { Projects } from "../pages/projects/Projects.jsx";
 import { deploymentTypes } from "../helpers/GetStaticData.js";
 
 let RequirePlatformAdmin;
@@ -115,6 +116,7 @@ function useMainAppRoutes() {
           </Route>
         )}
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="projects" element={<Projects />} />
         <Route
           path="api"
           element={<DeploymentsPage type={deploymentTypes.api} />}
